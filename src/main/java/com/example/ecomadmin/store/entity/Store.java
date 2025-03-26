@@ -1,9 +1,7 @@
 package com.example.ecomadmin.store.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -12,6 +10,8 @@ import java.time.LocalDate;
 @Entity
 @NoArgsConstructor
 @Table(name = "stores")
+@Builder
+@AllArgsConstructor
 public class Store {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,4 +28,5 @@ public class Store {
     private int totalRating;
     @Column(name = "monitoring_date")
     private LocalDate monitoringDate;
+
 }

@@ -6,6 +6,13 @@ import com.example.ecomadmin.store.entity.Store;
 import com.example.ecomadmin.store.reposiroty.StoreRepository;
 import com.example.ecomadmin.store.service.StoreService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +26,7 @@ public class StoreController {
     public String collectCsvData() {
         storeService.readAndSaveCsv();
         return "CSV 데이터가 DB에 저장되었습니다!";
+    }
 
     // 업체 리스트조회중 필터 기능
     @GetMapping
