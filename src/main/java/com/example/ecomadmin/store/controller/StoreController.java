@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class StoreController {
 
-    private StoreService storeService;
+    private final StoreService storeService;
 
     @PutMapping("/{storeId}")
     public StoreEntity updateStore(
