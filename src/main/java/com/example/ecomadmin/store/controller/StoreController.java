@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/stores")
@@ -22,6 +21,12 @@ public class StoreController {
 
     private final StoreRepository storeRepository;
     private final StoreService storeService;
+
+    @PostMapping("/collection")
+    public String collectCsvData() {
+        storeService.readAndSaveCsv();
+        return "CSV 데이터가 DB에 저장되었습니다!";
+    }
 
     // 업체 리스트조회중 필터 기능
     @GetMapping
