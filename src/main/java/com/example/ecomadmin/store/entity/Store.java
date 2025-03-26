@@ -1,6 +1,5 @@
 package com.example.ecomadmin.store.entity;
 
-import com.example.ecomadmin.store.enums.StoreStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,9 +18,8 @@ public class Store {
     private String domainName;
     private String email;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "store_status")
-    private StoreStatus storeStatus;
+    private String storeStatus;
     @Column(name = "total_rating")
     private int totalRating;
     @Column(name = "monitoring_date")

@@ -1,23 +1,23 @@
 package com.example.ecomadmin.store.reposiroty;
 
 import com.example.ecomadmin.store.entity.Store;
-import com.example.ecomadmin.store.enums.StoreStatus;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface StoreRepository extends JpaRepository<Store, Long> {
-    @Query(value =
-            "SELECT * " +
-                    "FROM Stores " +
-                    "WHERE (:totalRating IS NULL OR total_rating = :totalRating) " +
-                    "AND (:storeStatus IS NULL OR store_status = :storeStatus) " +
-                    "ORDER BY monitoring_date DESC " +
-                    "LIMIT 10", nativeQuery = true)
-    List<Store> filterByRatingAndStatus(
+    @Query("SELECT s FROM Store s " +
+            "WHERE (:totalRating IS NULL OR s.totalRating = :totalRating) " +
+            "AND (:storeStatus IS NULL OR s.storeStatus = :storeStatus) " +
+            "ORDER BY s.monitoringDate DESC")
+    List<Store> findAllByConditions(
             @Param("totalRating") Integer totalRating,
-            @Param("storeStatus") StoreStatus storeStatus
+            @Param("storeStatus") String storeStatus,
+            Pageable pageable
     );
 }
