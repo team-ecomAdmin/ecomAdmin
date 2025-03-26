@@ -1,19 +1,19 @@
-package com.example.ecomadmin.controller;
+package com.example.ecomadmin.store.controller;
 
-import com.example.ecomadmin.service.ShoppingMallService;
+import com.example.ecomadmin.store.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class ShoppingMallController {
+public class StoreController {
 
-    private final ShoppingMallService shoppingMallService;
+    private final StoreService storeService;
 
     @PostMapping("/collection")
     public String collectCsvData() {
-        shoppingMallService.readAndSaveCsv();
+        storeService.readAndSaveCsv();
         return "CSV 데이터가 DB에 저장되었습니다!";
     }
 }

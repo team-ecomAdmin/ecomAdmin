@@ -1,7 +1,7 @@
-package com.example.ecomadmin.service;
+package com.example.ecomadmin.store.service;
 
-import com.example.ecomadmin.entity.Stores;
-import com.example.ecomadmin.repository.ShoppingMallRepository;
+import com.example.ecomadmin.store.entity.Stores;
+import com.example.ecomadmin.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,14 +12,14 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class ShoppingMallService {
-    private final ShoppingMallRepository shoppingMallRepository;
+public class StoreService {
+    private final StoreRepository storeRepository;
 
     public void readAndSaveCsv() {
         try (
                 BufferedReader br = new BufferedReader(
                         new InputStreamReader(
-                                getClass().getResourceAsStream("/seouls.csv"),
+                                getClass().getResourceAsStream("/stores.csv"),
                                 StandardCharsets.UTF_8
                         )
                 )
@@ -45,7 +45,7 @@ public class ShoppingMallService {
                         .monitoringDate(LocalDateTime.parse(fields[5]))
                         .build();
 
-                shoppingMallRepository.save(stores);
+                storeRepository.save(stores);
             }
         } catch (Exception e) {
             e.printStackTrace();
