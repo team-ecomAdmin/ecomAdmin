@@ -37,6 +37,10 @@ public class AuthService {
                 () -> new IllegalStateException("사용자를 찾을 수 없습니다.")
         );
 
+        if(user.isDeleted()) {
+            throw new IllegalStateException("탈퇴된 사용자입니다.");
+        }
+
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
         }
