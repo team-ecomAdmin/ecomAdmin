@@ -1,5 +1,6 @@
 package com.example.ecomadmin.store.service;
 
+import com.example.ecomadmin.store.dto.StoreRequestDto;
 import com.example.ecomadmin.store.dto.StoreResponseDto;
 import com.example.ecomadmin.store.entity.Store;
 import com.example.ecomadmin.store.reposiroty.StoreRepository;
@@ -63,5 +64,19 @@ public class StoreService {
                 store.getTotalRating(),
                 store.getMonitoringDate()
         ));
+    }
+
+    @Transactional
+    public Store updateStore(Long storeId, StoreRequestDto requestDto) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new IllegalArgumentException("Store not found: " + storeId));
+
+        store.setCompanyName(requestDto.getCompanyName());
+        store.setDomainName(requestDto.getDomainName());
+        store.setEmail(requestDto.getEmail());
+        store.setStoreStatus(requestDto.getStoreStatus());
+        store.setTotalRating(requestDto.getTotalRating());
+
+        return storeRepository.save(store);
     }
 }
