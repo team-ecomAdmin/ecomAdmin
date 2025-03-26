@@ -1,5 +1,6 @@
 package com.example.ecomadmin.store.service;
 
+import com.example.ecomadmin.store.dto.StoreRequestDto;
 import com.example.ecomadmin.store.dto.StoreResponseDto;
 import com.example.ecomadmin.store.entity.Store;
 import com.example.ecomadmin.store.reposiroty.StoreRepository;
@@ -17,20 +18,6 @@ import java.util.List;
 public class StoreService {
 
     private final StoreRepository storeRepository;
-
-    @Transactional
-    public StoreEntity updateStore(Long storeId, StoreRequestDto requestDto) {
-        StoreEntity store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new IllegalArgumentException("Store not found: " + storeId));
-
-        store.setCompanyName(requestDto.getCompanyName());
-        store.setDomainName(requestDto.getDomainName());
-        store.setEmail(requestDto.getEmail());
-        store.setStoreStatus(requestDto.getStoreStatus());
-        store.setTotalRating(requestDto.getTotalRating());
-
-        return storeRepository.save(store);
-    }
 
     @Transactional(readOnly = true)
     public List<StoreResponseDto> findAll(Integer totalRating, String storeStatus) {
@@ -77,5 +64,19 @@ public class StoreService {
                 store.getTotalRating(),
                 store.getMonitoringDate()
         ));
+    }
+
+    @Transactional
+    public Store updateStore(Long storeId, StoreRequestDto requestDto) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new IllegalArgumentException("Store not found: " + storeId));
+
+        store.setCompanyName(requestDto.getCompanyName());
+        store.setDomainName(requestDto.getDomainName());
+        store.setEmail(requestDto.getEmail());
+        store.setStoreStatus(requestDto.getStoreStatus());
+        store.setTotalRating(requestDto.getTotalRating());
+
+        return storeRepository.save(store);
     }
 }
