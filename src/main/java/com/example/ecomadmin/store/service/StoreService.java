@@ -176,7 +176,7 @@ public class StoreService {
 
 
     // 스케줄러를 사용하여 주기적으로 OpenAPI 데이터 수집 실행 (예: 10초마다)
-    @Scheduled(cron = "0/10 * * * * ?")
+    @Scheduled(cron = "0 0 * * * *")
     public void scheduledCollectData() {
         collectAndSaveData();
     }
