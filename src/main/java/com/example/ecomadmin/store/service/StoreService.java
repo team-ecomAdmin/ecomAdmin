@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,7 +101,7 @@ public class StoreService {
         try (
                 BufferedReader br = new BufferedReader(
                         new InputStreamReader(
-                                getClass().getResourceAsStream("/stores.csv"),
+                                getClass().getResourceAsStream("/shop.csv"),
                                 StandardCharsets.UTF_8
                         )
                 )
@@ -115,18 +116,21 @@ public class StoreService {
 
                 String[] fields = line.split(",");
 
-                if (fields.length < 5) continue; // 컬럼 개수 검증
+//                if (fields.length < 5) continue; // 컬럼 개수 검증
 
-                Store stores = Store.builder()
-                        .companyName(fields[0])
-                        .domainName(fields[1])
-                        .email(fields[2])
-                        .storeStatus(fields[3])
-                        .totalRating(Integer.parseInt(fields[4]))
-                        .monitoringDate(LocalDate.from(LocalDateTime.parse(fields[5])))
+              try{  Store stores = Store.builder()
+                        .companyName(fields[1])
+                        .domainName(fields[2])
+                        .email(fields[3])
+                        .storeStatus(fields[4])
+                        .totalRating(Integer.parseInt(fields[5]))
+                        .monitoringDate(LocalDate.parse(fields[6]))
                         .build();
 
                 storeRepository.save(stores);
+            } catch (NumberFormatException nfe) {
+                  continue;
+              }
             }
         } catch (Exception e) {
             e.printStackTrace();
