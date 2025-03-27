@@ -5,19 +5,29 @@ import com.example.ecomadmin.store.dto.StoreResponseDto;
 import com.example.ecomadmin.store.entity.Store;
 import com.example.ecomadmin.store.reposiroty.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StoreService {
@@ -121,5 +131,53 @@ public class StoreService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Transactional
+    public void collectAndSaveData() {
+        log.info("OpenAPI 데이터 수집 시작");
+        try (InputStream is = getClass().getResourceAsStream("/stores.csv")) {
+            if (is == null) {
+                log.error("CSV 파일을 찾을 수 없습니다.");
+                return;
+            }
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+            CSVFormat csvFormat = CSVFormat.DEFAULT
+                    .withHeader("id", "company_name", "domain_name", "email", "store_status", "total_rating", "monitoring_date")
+                    .withSkipHeaderRecord();
+            CSVParser csvParser = new CSVParser(br, csvFormat);
+            List<Store> storeList = new ArrayList<>();
+            for (CSVRecord record : csvParser) {
+                Store store = Store.builder()
+                        .id(Long.parseLong(record.get("id")))
+                        .companyName(record.get("company_name"))
+                        .domainName(record.get("domain_name"))
+                        .email(record.get("email"))
+                        .storeStatus(record.get("store_status"))
+                        .totalRating(Integer.parseInt(record.get("total_rating")))
+                        .monitoringDate(LocalDate.parse(record.get("monitoring_date")))
+                        .build();
+                storeList.add(store);
+            }
+            csvParser.close();
+
+            // 100건씩 배치 저장
+            for (int i = 0; i < storeList.size(); i += 100) {
+                int end = Math.min(i + 100, storeList.size());
+                List<Store> batch = storeList.subList(i, end);
+                storeRepository.saveAll(batch);
+            }
+            log.info("OpenAPI 데이터 수집 및 저장 완료. 총 {}건 저장됨.", storeList.size());
+        } catch (Exception e) {
+            log.error("데이터 수집 중 예외 발생", e);
+        }
+        log.info("OpenAPI 데이터 수집 완료");
+    }
+
+
+    // 스케줄러를 사용하여 주기적으로 OpenAPI 데이터 수집 실행 (예: 10초마다)
+    @Scheduled(cron = "0/10 * * * * ?")
+    public void scheduledCollectData() {
+        collectAndSaveData();
     }
 }

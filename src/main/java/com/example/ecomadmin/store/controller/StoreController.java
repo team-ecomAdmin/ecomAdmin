@@ -49,10 +49,8 @@ public class StoreController {
     }
 
     @PutMapping("/{storeId}")
-    public Store updateStore(
-            @PathVariable Long storeId,
-            @RequestBody StoreRequestDto requestDto
-    ) {
+    public Store updateStore(@PathVariable Long storeId,
+                             @RequestBody StoreRequestDto requestDto) {
         return storeService.updateStore(storeId, requestDto);
     }
 }
