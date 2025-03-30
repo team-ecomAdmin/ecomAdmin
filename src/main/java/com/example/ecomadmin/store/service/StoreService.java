@@ -35,6 +35,49 @@ public class StoreService {
 
     private final StoreRepository storeRepository;
 
+    // csv파일을 데이터베이스에 입력
+    @Transactional
+    public void readAndSaveCsv() {
+        try (
+                BufferedReader br = new BufferedReader(
+                        new InputStreamReader(
+                                getClass().getResourceAsStream("/shop.csv"),
+                                StandardCharsets.UTF_8
+                        )
+                )
+        ) {
+            String line;
+            boolean isFirst = true;
+            while ((line = br.readLine()) != null) {
+                if (isFirst) { // 첫 줄은 헤더
+                    isFirst = false;
+                    continue;
+                }
+
+                String[] fields = line.split(",");
+
+//                if (fields.length < 5) continue; // 컬럼 개수 검증
+
+                try{  Store stores = Store.builder()
+                        .companyName(fields[1])
+                        .domainName(fields[2])
+                        .email(fields[3])
+                        .storeStatus(fields[4])
+                        .totalRating(Integer.parseInt(fields[5]))
+                        .monitoringDate(LocalDate.parse(fields[6]))
+                        .build();
+
+                    storeRepository.save(stores);
+                } catch (NumberFormatException nfe) {
+                    continue;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 업체 리스트 조회 중 필터 기능
     @Transactional(readOnly = true)
     public List<StoreResponseDto> findAll(Integer totalRating, String storeStatus) {
 
@@ -58,6 +101,7 @@ public class StoreService {
                 .toList();
     }
 
+    // Pageable 기반 업체 리스트 조회 (필터 2개 필수)
     @Transactional(readOnly = true)
     public Page<StoreResponseDto> findAllWithPaging(Integer totalRating, String storeStatus, Pageable pageable) {
 
@@ -82,6 +126,7 @@ public class StoreService {
         ));
     }
 
+    // 데이터베이스 정보 수정
     @Transactional
     public Store updateStore(Long storeId, StoreRequestDto requestDto) {
         Store store = storeRepository.findById(storeId)
@@ -96,47 +141,7 @@ public class StoreService {
         return storeRepository.save(store);
     }
 
-    @Transactional
-    public void readAndSaveCsv() {
-        try (
-                BufferedReader br = new BufferedReader(
-                        new InputStreamReader(
-                                getClass().getResourceAsStream("/shop.csv"),
-                                StandardCharsets.UTF_8
-                        )
-                )
-        ) {
-            String line;
-            boolean isFirst = true;
-            while ((line = br.readLine()) != null) {
-                if (isFirst) { // 첫 줄은 헤더
-                    isFirst = false;
-                    continue;
-                }
-
-                String[] fields = line.split(",");
-
-//                if (fields.length < 5) continue; // 컬럼 개수 검증
-
-              try{  Store stores = Store.builder()
-                        .companyName(fields[1])
-                        .domainName(fields[2])
-                        .email(fields[3])
-                        .storeStatus(fields[4])
-                        .totalRating(Integer.parseInt(fields[5]))
-                        .monitoringDate(LocalDate.parse(fields[6]))
-                        .build();
-
-                storeRepository.save(stores);
-            } catch (NumberFormatException nfe) {
-                  continue;
-              }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
+    // 스케줄러를 통한 csv파일 불러오기
     @Transactional
     public void collectAndSaveData() {
         log.info("OpenAPI 데이터 수집 시작");
