@@ -19,9 +19,9 @@ import java.util.List;
 @RequestMapping("/api/v1/stores")
 public class StoreController {
 
-    private final StoreRepository storeRepository;
     private final StoreService storeService;
 
+    // csv파일을 데이터베이스에 입력
     @PostMapping("/collection")
     public String collectCsvData() {
         storeService.readAndSaveCsv();
@@ -48,6 +48,7 @@ public class StoreController {
         return ResponseEntity.ok(storeService.findAllWithPaging(totalRating, storeStatus, pageable));
     }
 
+    // 데이터베이스 정보 수정
     @PutMapping("/{storeId}")
     public Store updateStore(@PathVariable Long storeId,
                              @RequestBody StoreRequestDto requestDto) {
